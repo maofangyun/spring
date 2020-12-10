@@ -68,6 +68,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
    */
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+    // 获取@MapperScan注解配置各种属性的信息
     AnnotationAttributes mapperScanAttrs = AnnotationAttributes
         .fromMap(importingClassMetadata.getAnnotationAttributes(MapperScan.class.getName()));
     if (mapperScanAttrs != null) {
@@ -78,7 +79,7 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
 
   void registerBeanDefinitions(AnnotationMetadata annoMeta, AnnotationAttributes annoAttrs,
       BeanDefinitionRegistry registry, String beanName) {
-
+    // 创建MapperScannerConfigurer的beanDefinition,采用建造者的设计模式,因为可配置的入参太多
     BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
     builder.addPropertyValue("processPropertyPlaceHolders", true);
 
@@ -137,7 +138,8 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     }
 
     builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(basePackages));
-
+    // 将MapperScannerConfigurer的beanDefinition加入spring容器,后续遍历BeanDefinitionRegistryPostProcessor接口实现类时,
+    // 会调用postProcessBeanDefinitionRegistry(),将Mapper接口的beanDefinition加入spring容器
     registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
 
   }

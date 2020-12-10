@@ -184,11 +184,11 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     }
 
     if (acceptAllInterfaces) {
-      // default include filter that accepts all classes
+      // 默认的IncludeFilter,接收所有的class,直接返回true
       addIncludeFilter((metadataReader, metadataReaderFactory) -> true);
     }
 
-    // exclude package-info.java
+    // 排除package-info.java
     addExcludeFilter((metadataReader, metadataReaderFactory) -> {
       String className = metadataReader.getClassMetadata().getClassName();
       return className.endsWith("package-info");
@@ -201,6 +201,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    // 通过basePackages得到包下所有的mappper接口,并创建对应的beanDefinition
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
     if (beanDefinitions.isEmpty()) {
@@ -233,6 +234,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      // 将Mapper接口的Class类型换成MapperFactoryBean,后续通过getObject()得到动态代理的mapper接口实现类
       definition.setBeanClass(this.mapperFactoryBeanClass);
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
@@ -247,6 +249,9 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
             new RuntimeBeanReference(this.sqlSessionFactoryBeanName));
         explicitFactoryUsed = true;
       } else if (this.sqlSessionFactory != null) {
+        // 在beanDefinition中添加一个sqlSessionFactory的属性,后续MapperFactoryBean初始化进行属性赋值时,
+        // 会调用SqlSessionDaoSupport类的setSqlSessionFactory(),将sqlSessionFactory传入,即MapperFactoryBean中存在sqlSessionFactory的引用,
+        // 在调用getObject()得到动态代理的mapper接口实现类时,实际调用的是通过sqlSessionFactory生成的sqlSession的getMapper()
         definition.getPropertyValues().add("sqlSessionFactory", this.sqlSessionFactory);
         explicitFactoryUsed = true;
       }
@@ -299,6 +304,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
    */
   @Override
   protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+    // 判断是否接口,可以筛选出所有的Mapper接口
     return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent();
   }
 

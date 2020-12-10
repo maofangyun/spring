@@ -376,7 +376,7 @@ public class MapperScannerConfigurer
         StringUtils.tokenizeToStringArray(this.basePackage, ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
   }
 
-  /*
+  /**
    * BeanDefinitionRegistries are called early in application startup, before BeanFactoryPostProcessors. This means that
    * PropertyResourceConfigurers will not have been loaded and any property substitution of this class' properties will
    * fail. To avoid this, find any PropertyResourceConfigurers defined in the context and run them on this class' bean

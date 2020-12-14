@@ -28,6 +28,7 @@ public class UserService {
 
   @Transactional
   public List<User> query() {
+    // TODO 测试spring事务
     return userMapper.query();
   }
 }

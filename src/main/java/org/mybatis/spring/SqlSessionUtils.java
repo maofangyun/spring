@@ -93,7 +93,7 @@ public final class SqlSessionUtils {
 
     notNull(sessionFactory, NO_SQL_SESSION_FACTORY_SPECIFIED);
     notNull(executorType, NO_EXECUTOR_TYPE_SPECIFIED);
-
+    // 从resources查询SqlSessionHolder,保证一个线程中只有一个sqlSession
     SqlSessionHolder holder = (SqlSessionHolder) TransactionSynchronizationManager.getResource(sessionFactory);
 
     SqlSession session = sessionHolder(executorType, holder);
@@ -102,8 +102,9 @@ public final class SqlSessionUtils {
     }
 
     LOGGER.debug(() -> "Creating a new SqlSession");
+    // 通过sessionFactory创建sqlSession,实际上就是选择不同的Executor
     session = sessionFactory.openSession(executorType);
-
+    // 将sessionFactory和sqlSession进行绑定
     registerSessionHolder(sessionFactory, executorType, exceptionTranslator, session);
 
     return session;
@@ -128,13 +129,15 @@ public final class SqlSessionUtils {
   private static void registerSessionHolder(SqlSessionFactory sessionFactory, ExecutorType executorType,
       PersistenceExceptionTranslator exceptionTranslator, SqlSession session) {
     SqlSessionHolder holder;
+    // 判断是否开启事务同步管理器
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       Environment environment = sessionFactory.getConfiguration().getEnvironment();
-
+      // 判断事务工厂是否属于spring的,即是否集成了spring事务
       if (environment.getTransactionFactory() instanceof SpringManagedTransactionFactory) {
         LOGGER.debug(() -> "Registering transaction synchronization for SqlSession [" + session + "]");
 
         holder = new SqlSessionHolder(session, executorType, exceptionTranslator);
+        // 将sessionFactory和sqlSession进行绑定
         TransactionSynchronizationManager.bindResource(sessionFactory, holder);
         TransactionSynchronizationManager
             .registerSynchronization(new SqlSessionSynchronization(holder, sessionFactory));

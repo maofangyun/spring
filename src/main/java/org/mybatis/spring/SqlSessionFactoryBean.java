@@ -487,7 +487,7 @@ public class SqlSessionFactoryBean
     notNull(sqlSessionFactoryBuilder, "Property 'sqlSessionFactoryBuilder' is required");
     state((configuration == null && configLocation == null) || !(configuration != null && configLocation != null),
         "Property 'configuration' and 'configLocation' can not specified with together");
-
+    // 解析配置文件,生成configuration对象,创建sqlSessionFactory
     this.sqlSessionFactory = buildSqlSessionFactory();
   }
 
@@ -505,7 +505,7 @@ public class SqlSessionFactoryBean
   protected SqlSessionFactory buildSqlSessionFactory() throws Exception {
 
     final Configuration targetConfiguration;
-
+    // 解析mybatis-config.xml配置文件
     XMLConfigBuilder xmlConfigBuilder = null;
     if (this.configuration != null) {
       targetConfiguration = this.configuration;

@@ -16,7 +16,7 @@ public class TestMybatis {
 
   public static void main(String[] args) {
     AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(TestMybatis.class);
-    UserService bean = ac.getBean(UserService.class);
+    UserMapper bean = ac.getBean(UserMapper.class);
     System.out.println(bean.query());
   }
 

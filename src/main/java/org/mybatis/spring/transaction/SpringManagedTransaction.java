@@ -64,7 +64,6 @@ public class SpringManagedTransaction implements Transaction {
   @Override
   public Connection getConnection() throws SQLException {
     if (this.connection == null) {
-      // 获取连接对象
       openConnection();
     }
     return this.connection;
@@ -78,13 +77,8 @@ public class SpringManagedTransaction implements Transaction {
    * false and will always call commit/rollback so we need to no-op that calls.
    */
   private void openConnection() throws SQLException {
-    // 从数据库连接池中获取连接对象,与spring集成时,此处的dataSource与spring中DataSourceTransactionManager持有dataSource是同一个
-    // 与spring集成之后,mybatis不再负责事务的提交和回滚,而是由spring进行管理
-    // 通过spring中的TransactionSynchronizationManager的resources属性(ThreadLocal变量,保存了数据库线程池对象和连接对象的映射关系),
-    // 保证mybatis中的进行数据库CRUD的连接对象和spring中进行事务管理的连接对象是同一个
     this.connection = DataSourceUtils.getConnection(this.dataSource);
     this.autoCommit = this.connection.getAutoCommit();
-    // 判断连接是否有事务,即方法前是否存在@Transactional注解,若不存在,则连接对象的管理交给mybatis,反之,交给spring
     this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
 
     LOGGER.debug(() -> "JDBC Connection [" + this.connection + "] will"

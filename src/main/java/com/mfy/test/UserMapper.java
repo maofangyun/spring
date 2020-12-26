@@ -19,6 +19,13 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Select;
 
+/**
+ * 由于使用了MapperFactoryBean的getObject()来生成UserMapper的代理对象,
+ * 在扫描mapper接口,生成beanDefinition时,会将beanClass设置成MapperFactoryBean.class,
+ * 因此用ac.getBean(UserMapper.class)调用,生成的是MapperFactoryBean对象,所以,为了避免这种情况,
+ * spring会事先调用ac.getBean("userMapper"),生成UserMapper的代理对象,再次调用ac.getBean(UserMapper.class),
+ * 就没有问题了
+ * */
 public interface UserMapper {
 
   @Select("SELECT username,sex FROM user")

@@ -80,9 +80,14 @@ public class MapperScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
   void registerBeanDefinitions(AnnotationMetadata annoMeta, AnnotationAttributes annoAttrs,
       BeanDefinitionRegistry registry, String beanName) {
     // 创建MapperScannerConfigurer的beanDefinition,采用建造者的设计模式,因为可配置的入参太多
+    // MapperScannerRegistrar就做一件事,向spring容器中注入MapperScannerConfigurer的BeanDefinition,封装@MapperScan的注解信息给BeanDefinition
+    // MapperScannerConfigurer根据这些注解的配置信息,确定扫描范围和扫描方式,同时将扫描得到的mapper接口变成BeanDefinition注入spring容器,
+    // 注意点:mapper接口的BeanDefinition的
     BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
     builder.addPropertyValue("processPropertyPlaceHolders", true);
 
+    // 设置需要扫描的注解,默认是Annotation.class,这里并没有起作用,
+    // 其实后续是通过basepackage中的class文件是否为接口来筛选mapper
     Class<? extends Annotation> annotationClass = annoAttrs.getClass("annotationClass");
     if (!Annotation.class.equals(annotationClass)) {
       builder.addPropertyValue("annotationClass", annotationClass);

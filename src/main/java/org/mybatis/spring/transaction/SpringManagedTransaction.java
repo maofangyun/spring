@@ -85,6 +85,7 @@ public class SpringManagedTransaction implements Transaction {
     this.connection = DataSourceUtils.getConnection(this.dataSource);
     this.autoCommit = this.connection.getAutoCommit();
     // 判断连接是否有事务,即方法前是否存在@Transactional注解,若不存在,则连接对象的管理交给mybatis,反之,交给spring
+    // 判断的方法也很简单,就是比较当前的connection是否和事务同步管理器中缓存的是否一致
     this.isConnectionTransactional = DataSourceUtils.isConnectionTransactional(this.connection, this.dataSource);
 
     LOGGER.debug(() -> "JDBC Connection [" + this.connection + "] will"

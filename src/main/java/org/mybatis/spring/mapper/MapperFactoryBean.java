@@ -93,7 +93,7 @@ public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements Factor
    */
   @Override
   public T getObject() throws Exception {
-    // 得到Mapper接口的动态代理对象
+    // 得到Mapper接口的动态代理对象,getSqlSession()返回的是sqlSessionTemplate.最终调用的是configuration.getMapper()
     return getSqlSession().getMapper(this.mapperInterface);
   }
 

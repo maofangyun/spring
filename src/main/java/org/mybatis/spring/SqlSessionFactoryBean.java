@@ -592,7 +592,7 @@ public class SqlSessionFactoryBean
         ErrorContext.instance().reset();
       }
     }
-
+    // 设置事务工厂,和spring结合的点
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
         this.dataSource));

@@ -507,6 +507,7 @@ public class SqlSessionFactoryBean
     final Configuration targetConfiguration;
     // 解析mybatis-config.xml配置文件
     XMLConfigBuilder xmlConfigBuilder = null;
+    // 当configuration不为null时,直接返回
     if (this.configuration != null) {
       targetConfiguration = this.configuration;
       if (targetConfiguration.getVariables() == null) {
@@ -514,10 +515,10 @@ public class SqlSessionFactoryBean
       } else if (this.configurationProperties != null) {
         targetConfiguration.getVariables().putAll(this.configurationProperties);
       }
-    } else if (this.configLocation != null) {
+    } else if (this.configLocation != null) {   // 当指定了mybatis-config.xml的位置时,直接解析
       xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null, this.configurationProperties);
       targetConfiguration = xmlConfigBuilder.getConfiguration();
-    } else {
+    } else {    // 未指定mybatis-config.xml文件位置,即无xml配置的方式
       LOGGER.debug(
           () -> "Property 'configuration' or 'configLocation' not specified, using default MyBatis Configuration");
       targetConfiguration = new Configuration();
@@ -592,7 +593,7 @@ public class SqlSessionFactoryBean
         ErrorContext.instance().reset();
       }
     }
-    // 设置事务工厂,和spring结合的点
+    // 设置事务工厂,和spring结合的点,当使用无xml配置方式时(常用),事务工厂默认是SpringManagedTransactionFactory
     targetConfiguration.setEnvironment(new Environment(this.environment,
         this.transactionFactory == null ? new SpringManagedTransactionFactory() : this.transactionFactory,
         this.dataSource));

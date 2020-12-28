@@ -49,6 +49,7 @@ public abstract class SqlSessionDaoSupport extends DaoSupport {
    */
   public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     if (this.sqlSessionTemplate == null || sqlSessionFactory != this.sqlSessionTemplate.getSqlSessionFactory()) {
+      // sqlSessionTemplate内含了sqlSessionProxy,所有sqlSession的方法调用,最终都会转到动态代理对象的invoke()
       this.sqlSessionTemplate = createSqlSessionTemplate(sqlSessionFactory);
     }
   }

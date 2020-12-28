@@ -139,6 +139,7 @@ public final class SqlSessionUtils {
         holder = new SqlSessionHolder(session, executorType, exceptionTranslator);
         // 将sessionFactory和sqlSession进行绑定
         TransactionSynchronizationManager.bindResource(sessionFactory, holder);
+        // 注册事务的后置处理器
         TransactionSynchronizationManager
             .registerSynchronization(new SqlSessionSynchronization(holder, sessionFactory));
         holder.setSynchronizedWithTransaction(true);
